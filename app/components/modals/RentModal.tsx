@@ -8,6 +8,7 @@ import Heading from "../Heading";
 import CategoryInput from "../inputs/CategoryInput";
 import { FieldValues, useForm } from "react-hook-form";
 import CountrySelect from "../inputs/CountrySelect";
+import dynamic from "next/dynamic";
 
 enum STEPS {
 	CATEGORY = 0,
@@ -45,6 +46,12 @@ const RentModal = () => {
 
 	const category = watch("category");
 	const location = watch("location");
+
+	const Map = useMemo(
+		() => dynamic(() => import("../Map"), { ssr: false }),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[location]
+	);
 
 	const setCustomValue = (id: string, value: any) => {
 		setValue(id, value, {
@@ -108,7 +115,7 @@ const RentModal = () => {
 		</div>
 	);
 
-	if (step === STEPS.DESCRIPTION) {
+	if (step === STEPS.LOCATION) {
 		bodyContent = (
 			<div className="flex flex-col gap-8">
 				<Heading
@@ -119,6 +126,7 @@ const RentModal = () => {
 					value={location}
 					onChange={(value) => setCustomValue("location", value)}
 				/>
+				<Map center={location?.latlng} />
 			</div>
 		);
 	}
