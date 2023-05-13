@@ -42,13 +42,18 @@ const RegisterModal = () => {
 			.then(() => {
 				registerModal.onClose();
 			})
-			.catch((error) => {
+			.catch(() => {
 				toast.error("Something went wrong!");
 			})
 			.finally(() => {
 				setIsLoading(false);
 			});
 	};
+
+	const toggle = useCallback(() => {
+		loginModal.onClose();
+		registerModal.onOpen();
+	}, [loginModal, registerModal]);
 
 	const bodyContent = (
 		<div className="flex flex-col gap-4">
@@ -100,10 +105,7 @@ const RegisterModal = () => {
 				<div className="flex flex-row items-center justify-center gap-2">
 					<div>Already have an account?</div>
 					<div
-						onClick={() => {
-							registerModal.onClose();
-							loginModal.onOpen();
-						}}
+						onClick={toggle}
 						className="text-neutral-800 cursor-pointer hover:underline"
 					>
 						Log in
