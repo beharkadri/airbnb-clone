@@ -1,7 +1,7 @@
-import prisma from "@/app/libs/prismadb";
 import { NextResponse } from "next/server";
 
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import prisma from "@/app/libs/prismadb";
 
 interface IParams {
 	listingId?: string;
@@ -20,16 +20,20 @@ export async function POST(request: Request, { params }: { params: IParams }) {
 		throw new Error("Invalid ID");
 	}
 
-	const favoriteIds = [...(currentUser.favoriteIds || []), listingId];
+	let favoriteIds = [...(currentUser.favoriteIds || [])];
 
-	const updatedUser = await prisma.user.update({
+	favoriteIds.push(listingId);
+
+	const user = await prisma.user.update({
 		where: {
 			id: currentUser.id,
 		},
-		data: { favoriteIds },
+		data: {
+			favoriteIds,
+		},
 	});
 
-	return NextResponse.json(updatedUser);
+	return NextResponse.json(user);
 }
 
 export async function DELETE(
@@ -48,16 +52,18 @@ export async function DELETE(
 		throw new Error("Invalid ID");
 	}
 
-	const favoriteIds = [
-		...(currentUser.favoriteIds.filter((id) => id !== listingId) || []),
-	];
+	let favoriteIds = [...(currentUser.favoriteIds || [])];
 
-	const updatedUser = await prisma.user.update({
+	favoriteIds = favoriteIds.filter((id) => id !== listingId);
+
+	const user = await prisma.user.update({
 		where: {
 			id: currentUser.id,
 		},
-		data: { favoriteIds },
+		data: {
+			favoriteIds,
+		},
 	});
 
-	return NextResponse.json(updatedUser);
+	return NextResponse.json(user);
 }
